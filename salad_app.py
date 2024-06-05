@@ -56,12 +56,12 @@ if employee_id:
         monthly_rank = data.groupby(["職員番号", data["日付"].dt.to_period("M")])["摂取グラム数"].sum().reset_index()
         monthly_rank = monthly_rank.groupby("職員番号")["摂取グラム数"].sum().sort_values(ascending=False).reset_index()
 
-        # ランキング表示
-        st.write(monthly_rank)
-
-        # 自分の順位を表示
+        # 自分の順位を計算
         rank = monthly_rank[monthly_rank["職員番号"] == employee_id].index[0] + 1
         st.write(f"あなたの順位: {rank}位")
+
+        # ランキング表示
+        st.dataframe(monthly_rank)
 
         # 自分のデータを強調表示
         monthly_rank["順位"] = monthly_rank.index + 1
