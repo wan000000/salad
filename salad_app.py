@@ -30,23 +30,29 @@ if employee_id:
     # 月間累計摂取量の表示
     if not data.empty:
         data["日付"] = pd.to_datetime(data["日付"])
-        monthly_data = data[data["職員番号"] == employee_id].groupby(data["日付"].dt.to_period("M"))["摂取グラム数"].sum()
+        user_data = data[data["職員番号"] == employee_id]
+        if not user_data.empty:
+            monthly_data = user_data.groupby(user_data["日付"].dt.to_period("M"))["摂取グラム数"].sum()
 
-        st.write("月間累計摂取量")
-        st.bar_chart(monthly_data)
+            st.write("月間累計摂取量")
+            st.bar_chart(monthly_data)
 
-    # カレンダー表示
-    st.write("摂取日カレンダー")
-    calendar = data[data["職員番号"] == employee_id].set_index("日付").resample("D").sum()
-    fig, ax = plt.subplots(figsize=(10, 4))
-    ax.plot(calendar.index, calendar["摂取グラム数"], marker='o', linestyle='-')
-    ax.set_title("サラダ摂取量")
-    ax.set_xlabel("日付")
-    ax.set_ylabel("摂取グラム数")
-    st.pyplot(fig)
+            # カレンダー表示
+            st.write("摂取日カレンダー")
+            calendar = user_data.set_index("日付").resample("D").sum()
+            fig, ax = plt.subplots(figsize=(10, 4))
+            ax.plot(calendar.index, calendar["摂取グラム数"], marker='o', linestyle='-')
+            ax.set_title("サラダ摂取量")
+            ax.set_xlabel("日付")
+            ax.set_ylabel("摂取グラム数")
+            st.pyplot(fig)
+
+        else:
+            st.write("まだデータがありません。")
 
     # ランキング表示
-    st.write("月間サラダ摂取量ランキング")
-    monthly_rank = data.groupby(["職員番号", data["日付"].dt.to_period("M")])["摂取グラム数"].sum().reset_index()
-    monthly_rank = monthly_rank.groupby("職員番号")["摂取グラム数"].sum().sort_values(ascending=False)
-    st.write(monthly_rank)
+    if not data.empty:
+        st.write("月間サラダ摂取量ランキング")
+        monthly_rank = data.groupby(["職員番号", data["日付"].dt.to_period("M")])["摂取グラム数"].sum().reset_index()
+        monthly_rank = monthly_rank.groupby("職員番号")["摂取グラム数"].sum().sort_values(ascending=False)
+        st.write(monthly_rank)
