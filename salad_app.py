@@ -30,10 +30,10 @@ if employee_id:
     # 月間累計摂取量の表示
     if not data.empty:
         data["日付"] = pd.to_datetime(data["日付"])
-        monthly_data = data[data["職員番号"] == employee_id].groupby(data["日付"].dt.to_period("M")).sum()
+        monthly_data = data[data["職員番号"] == employee_id].groupby(data["日付"].dt.to_period("M"))["摂取グラム数"].sum()
 
         st.write("月間累計摂取量")
-        st.bar_chart(monthly_data["摂取グラム数"])
+        st.bar_chart(monthly_data)
 
     # カレンダー表示
     st.write("摂取日カレンダー")
@@ -47,6 +47,6 @@ if employee_id:
 
     # ランキング表示
     st.write("月間サラダ摂取量ランキング")
-    monthly_rank = data.groupby(["職員番号", data["日付"].dt.to_period("M")]).sum().reset_index()
-    monthly_rank = monthly_rank.groupby("職員番号").sum().sort_values(by="摂取グラム数", ascending=False)
+    monthly_rank = data.groupby(["職員番号", data["日付"].dt.to_period("M")])["摂取グラム数"].sum().reset_index()
+    monthly_rank = monthly_rank.groupby("職員番号")["摂取グラム数"].sum().sort_values(ascending=False)
     st.write(monthly_rank)
