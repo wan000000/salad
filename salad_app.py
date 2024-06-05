@@ -23,7 +23,7 @@ if employee_id:
 
     if record_button:
         new_record = {"職員番号": employee_id, "日付": datetime.date.today(), "摂取グラム数": intake}
-        data = data.append(new_record, ignore_index=True)
+        data = pd.concat([data, pd.DataFrame([new_record])], ignore_index=True)
         data.to_csv("salad_intake.csv", index=False)
         st.success("記録が追加されました")
 
