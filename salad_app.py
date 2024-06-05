@@ -54,5 +54,15 @@ if employee_id:
     if not data.empty:
         st.write("月間サラダ摂取量ランキング")
         monthly_rank = data.groupby(["職員番号", data["日付"].dt.to_period("M")])["摂取グラム数"].sum().reset_index()
-        monthly_rank = monthly_rank.groupby("職員番号")["摂取グラム数"].sum().sort_values(ascending=False)
+        monthly_rank = monthly_rank.groupby("職員番号")["摂取グラム数"].sum().sort_values(ascending=False).reset_index()
+
+        # ランキング表示
         st.write(monthly_rank)
+
+        # 自分の順位を表示
+        rank = monthly_rank[monthly_rank["職員番号"] == employee_id].index[0] + 1
+        st.write(f"あなたの順位: {rank}位")
+
+        # 自分のデータを強調表示
+        monthly_rank["順位"] = monthly_rank.index + 1
+        st.dataframe(monthly_rank.style.apply(lambda x: ["background-color: yellow" if x["職員番号"] == employee_id else "" for i in x], axis=1))
