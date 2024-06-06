@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import datetime
+import calendar
 
 # データフレームの初期化
 @st.cache(allow_output_mutation=True)
@@ -39,12 +40,33 @@ if employee_id:
 
             # カレンダー表示
             st.write("摂取日カレンダー")
-            calendar = user_data.set_index("日付").resample("D").sum()
+            current_month = datetime.date.today().replace(day=1)
+            first_day, last_day = calendar.monthrange(current_month.year, current_month.month)
+            days = pd.date_range(start=current_month, periods=last_day, freq='D')
+            days_df = pd.DataFrame(days, columns=["日付"])
+            days_df["摂取グラム数"] = 0
+            days_df.set_index("日付", inplace=True)
+            user_data.set_index("日付", inplace=True)
+            days_df.update(user_data)
+
             fig, ax = plt.subplots(figsize=(10, 4))
-            ax.plot(calendar.index, calendar["摂取グラム数"], marker='o', linestyle='-')
-            ax.set_title("サラダ摂取量")
-            ax.set_xlabel("日付")
-            ax.set_ylabel("摂取グラム数")
+            ax.axis('off')
+            table_data = []
+
+            for i in range(6):
+                week = []
+                for j in range(7):
+                    day = i * 7 + j - first_day + 1
+                    if day > 0 and day <= last_day:
+                        if days_df.iloc[day - 1]["摂取グラム数"] > 0:
+                            week.append(f"{day}\n🥗")
+                        else:
+                            week.append(f"{day}")
+                    else:
+                        week.append("")
+                table_data.append(week)
+
+            ax.table(cellText=table_data, cellLoc='center', loc='center', colLabels=['日', '月', '火', '水', '木', '金', '土'])
             st.pyplot(fig)
 
         else:
