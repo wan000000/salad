@@ -34,10 +34,17 @@ if employee_id:
         data["日付"] = pd.to_datetime(data["日付"])
         user_data = data[data["職員番号"] == employee_id]
         if not user_data.empty:
-            monthly_data = user_data.groupby(user_data["日付"].dt.to_period("M"))["摂取グラム数"].sum()
+            user_data = user_data.set_index("日付").resample("D").sum().fillna(0)
+            user_data["累計摂取グラム数"] = user_data["摂取グラム数"].cumsum()
 
             st.write("月間累計摂取量")
-            st.bar_chart(monthly_data)
+            st.write("この表は各月のサラダ摂取量を積み上げで折れ線グラフにしています")
+            fig, ax = plt.subplots()
+            ax.plot(user_data.index, user_data["累計摂取グラム数"], marker='o', linestyle='-')
+            ax.set_title("月間累計摂取量")
+            ax.set_xlabel("日付")
+            ax.set_ylabel("累計摂取グラム数")
+            st.pyplot(fig)
 
             # カレンダー表示
             st.write("摂取日カレンダー")
@@ -47,7 +54,6 @@ if employee_id:
             days_df = pd.DataFrame(days, columns=["日付"])
             days_df["摂取グラム数"] = 0
             days_df.set_index("日付", inplace=True)
-            user_data.set_index("日付", inplace=True)
             days_df.update(user_data)
 
             fig, ax = plt.subplots(figsize=(10, 6))
