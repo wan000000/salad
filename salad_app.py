@@ -5,11 +5,6 @@ import datetime
 import calendar
 import matplotlib.font_manager as fm
 
-# 日本語フォントの設定
-font_path = '/usr/share/fonts/truetype/fonts-japanese-gothic.ttf'
-font_prop = fm.FontProperties(fname=font_path)
-plt.rcParams['font.family'] = font_prop.get_name()
-
 # データフレームの初期化
 @st.cache(allow_output_mutation=True)
 def get_data():
@@ -72,7 +67,7 @@ if employee_id:
                         week.append("")
                 table_data.append(week)
 
-            col_labels = ['日', '月', '火', '水', '木', '金', '土']
+            col_labels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
             ax.table(cellText=table_data, cellLoc='center', loc='center', colLabels=col_labels, colColours=['#f0f0f0']*7)
             st.pyplot(fig)
 
