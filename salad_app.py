@@ -60,7 +60,7 @@ if employee_id:
                     day = i * 7 + j - first_day + 1
                     if day > 0 and day <= last_day:
                         if days_df.iloc[day - 1]["摂取グラム数"] > 0:
-                            week.append(f"{day}\n🥗")
+                            week.append(f"{day}\n〇")
                         else:
                             week.append(f"{day}")
                     else:
